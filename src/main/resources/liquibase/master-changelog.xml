@@ -39,10 +39,13 @@
             <column name="twitter_id" type="nvarchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="tweet_id" type="nvarchar(255)">
+            <column name="tweet_id" type="bigint">
                 <constraints nullable="false" unique="true"/>
             </column>
             <column name="message" type="nvarchar(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tweet_date" type="timestamp">
                 <constraints nullable="false"/>
             </column>
         </createTable>
