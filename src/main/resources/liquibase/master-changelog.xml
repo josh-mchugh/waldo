@@ -27,9 +27,9 @@
             <column name="url" type="nvarchar(max)"/>
             <column name="followers" type="bigint"/>
         </createTable>
-        <createTable tableName="twitter">
+        <createTable tableName="tweet">
             <column name="id" type="nvarchar(255)">
-                <constraints primaryKey="true" primaryKeyName="PK__twitter"/>
+                <constraints primaryKey="true" primaryKeyName="PK__tweet"/>
             </column>
             <column name="version" type="bigint"/>
             <column name="created_by" type="nvarchar(255)"/>
@@ -49,6 +49,24 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <addForeignKeyConstraint baseTableName="tweet" baseColumnNames="id" constraintName="fk__tweet_twitter_id_twitter_id" referencedTableName="twitter" referencedColumnNames="id"/>
+        <createTable tableName="hashtag">
+            <column name="id" type="nvarchar(255)">
+                <constraints primaryKey="true" primaryKeyName="PK__hashtag"/>
+            </column>
+            <column name="version" type="bigint"/>
+            <column name="created_by" type="nvarchar(255)"/>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="nvarchar(255)"/>
+            <column name="last_modified_date" type="timestamp"/>
+            <column name="tweet_id" type="nvarchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hashtag" type="nvarchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="hashtag" baseColumnNames="id" constraintName="fk__hashtag_tweet_id_tweet_id" referencedTableName="tweet" referencedColumnNames="id" />
     </changeSet>
 
 </databaseChangeLog>

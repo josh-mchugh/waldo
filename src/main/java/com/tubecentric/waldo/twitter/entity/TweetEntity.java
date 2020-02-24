@@ -4,14 +4,9 @@ import com.tubecentric.waldo.framework.entity.AbstractEntity;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -34,4 +29,7 @@ public class TweetEntity extends AbstractEntity {
     @Basic
     @Column(name = "tweet_date", nullable = false)
     private LocalDateTime tweetDate;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "tweet")
+    private List<HashtagEntity> hashtags;
 }
