@@ -1,9 +1,10 @@
-package com.tubecentric.waldo.twitter;
+package com.tubecentric.waldo.twitter.listener;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.tubecentric.waldo.framework.TwitterConfig;
 import com.tubecentric.waldo.twitter.integration.TwitterGateway;
+import com.tubecentric.waldo.twitter.model.TweetDTO;
+import com.tubecentric.waldo.twitter.model.TwitterDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class TwitterService {
+public class TwitterListener {
 
     private final TwitterConfig twitterConfig;
     private final ApplicationContext context;
@@ -40,22 +41,40 @@ public class TwitterService {
                 .setOAuthAccessToken(twitterConfig.getAccessToken())
                 .setOAuthAccessTokenSecret(twitterConfig.getAccessTokenSecret());
 
+        TwitterStream twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
+        twitterStream.addListener(getTwitterListener());
 
-        StatusListener listener = new StatusListener(){
+        twitterStream.sample();
+        twitterStream.filter(new FilterQuery().track("#smallyoutuber", "#SmallYouTuberArmy", "#youtubers", "#smallyoutubecommunity").language("en"));
+    }
+
+    private StatusListener getTwitterListener() {
+
+        return new StatusListener() {
 
             public void onStatus(Status status) {
 
                 TwitterGateway twitterGateway = context.getBean(TwitterGateway.class);
-                twitterGateway.send("Test");
 
-                log.info("=======================================================");
-                log.info("Url: {}", status.getUser().getURL());
-                log.info("Username: {}", status.getUser().getName());
-                log.info("Description: {}", status.getUser().getDescription());
-                log.info("Message: {}", status.getText());
-                log.info("Hashtags: {}", Joiner.on(",").join(Lists.newArrayList(status.getHashtagEntities()).stream().map(HashtagEntity::getText).collect(Collectors.toList())));
-                log.info("Is Retweet: {}", status.isRetweet());
-                log.info("=======================================================");
+                TwitterDTO twitterDTO = TwitterDTO.builder()
+                        .twitterId(status.getUser().getId())
+                        .username(status.getUser().getName())
+                        .screenName(status.getUser().getScreenName())
+                        .description(status.getUser().getDescription())
+                        .url(status.getUser().getURL())
+                        .followers((long) status.getUser().getFollowersCount())
+                        .tweet(TweetDTO.builder()
+                                .tweetId(status.getId())
+                                .message(status.getText())
+                                .isRetweet(status.isRetweet())
+                                .hashtags(Lists.newArrayList(status.getHashtagEntities()).stream()
+                                        .map(HashtagEntity::getText).collect(Collectors.toList())
+                                )
+                                .build()
+                        )
+                        .build();
+
+                twitterGateway.send(twitterDTO);
             }
 
             public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
@@ -85,12 +104,5 @@ public class TwitterService {
                 log.error("Unable to process status", ex);
             }
         };
-
-        TwitterStream twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
-        twitterStream.addListener(listener);
-
-        // sample() method internally creates a thread which manipulates TwitterStream and calls these adequate listener methods continuously.
-        twitterStream.sample();
-        twitterStream.filter(new FilterQuery().track("#smallyoutuber", "#SmallYouTuberArmy", "#youtubers", "#smallyoutubecommunity").language("en"));
     }
 }
