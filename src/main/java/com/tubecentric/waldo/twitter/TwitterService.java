@@ -3,9 +3,11 @@ package com.tubecentric.waldo.twitter;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.tubecentric.waldo.framework.TwitterConfig;
+import com.tubecentric.waldo.twitter.integration.TwitterGateway;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import twitter4j.FilterQuery;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 public class TwitterService {
 
     private final TwitterConfig twitterConfig;
+    private final ApplicationContext context;
 
     @EventListener(ApplicationReadyEvent.class)
     public void doSomethingAfterStartup() {
@@ -41,6 +44,9 @@ public class TwitterService {
         StatusListener listener = new StatusListener(){
 
             public void onStatus(Status status) {
+
+                TwitterGateway twitterGateway = context.getBean(TwitterGateway.class);
+                twitterGateway.send("Test");
 
                 log.info("=======================================================");
                 log.info("Url: {}", status.getUser().getURL());
