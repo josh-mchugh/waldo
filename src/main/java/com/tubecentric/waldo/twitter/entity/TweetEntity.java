@@ -35,5 +35,5 @@ public class TweetEntity extends AbstractEntity {
     private boolean favorited;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "tweet")
-    private List<HashtagEntity> hashtags;
+    private List<TweetHashtagEntity> tweetHashtags;
 }

@@ -2,8 +2,10 @@ package com.tubecentric.waldo.twitter.service;
 
 import com.querydsl.jpa.JPQLQueryFactory;
 import com.tubecentric.waldo.twitter.entity.HashtagEntity;
+import com.tubecentric.waldo.twitter.entity.QHashtagEntity;
 import com.tubecentric.waldo.twitter.entity.QTwitterEntity;
 import com.tubecentric.waldo.twitter.entity.TweetEntity;
+import com.tubecentric.waldo.twitter.entity.TweetHashtagEntity;
 import com.tubecentric.waldo.twitter.entity.TwitterEntity;
 import com.tubecentric.waldo.twitter.model.TwitterDTO;
 import lombok.RequiredArgsConstructor;
@@ -43,11 +45,12 @@ public class TwitterEntityService implements ITwitterEntityService {
         tweetEntity.setFavorited(false);
 
         // Build hashtag list for tweet
-        List<HashtagEntity> hashtagEntities = twitterDTO.getTweet().getHashtags().stream()
-                .map(hashtag -> new HashtagEntity(tweetEntity, hashtag))
+        List<TweetHashtagEntity> tweetHashtagEntities = twitterDTO.getTweet().getHashtags().stream()
+                .map(this::getOrCreate)
+                .map(hashtagEntity -> new TweetHashtagEntity(tweetEntity, hashtagEntity))
                 .collect(Collectors.toList());
 
-        tweetEntity.setHashtags(hashtagEntities);
+        tweetEntity.setTweetHashtags(tweetHashtagEntities);
 
         // Save Tweet to Twitter account
         twitterEntity.getTweets().add(tweetEntity);
@@ -58,23 +61,19 @@ public class TwitterEntityService implements ITwitterEntityService {
 
     private TwitterEntity getOrCreate(TwitterDTO twitterDTO) {
 
-        TwitterEntity twitterEntity = null;
-
         if(existsTWitter(twitterDTO.getTwitterId())) {
 
-            twitterEntity = getTwitterEntity(twitterDTO.getTwitterId());
-
-        } else {
-
-            twitterEntity = new TwitterEntity();
-            twitterEntity.setTwitterId(twitterDTO.getTwitterId());
-            twitterEntity.setUsername(twitterDTO.getUsername());
-            twitterEntity.setScreenName(twitterDTO.getScreenName());
-            twitterEntity.setDescription(twitterDTO.getDescription());
-            twitterEntity.setUrl(twitterDTO.getUrl());
-            twitterEntity.setFollowers(twitterDTO.getFollowers());
-            twitterEntity.setTweets(new ArrayList<>());
+            return getTwitterEntity(twitterDTO.getTwitterId());
         }
+
+        TwitterEntity twitterEntity = new TwitterEntity();
+        twitterEntity.setTwitterId(twitterDTO.getTwitterId());
+        twitterEntity.setUsername(twitterDTO.getUsername());
+        twitterEntity.setScreenName(twitterDTO.getScreenName());
+        twitterEntity.setDescription(twitterDTO.getDescription());
+        twitterEntity.setUrl(twitterDTO.getUrl());
+        twitterEntity.setFollowers(twitterDTO.getFollowers());
+        twitterEntity.setTweets(new ArrayList<>());
 
         return twitterEntity;
     }
@@ -95,6 +94,40 @@ public class TwitterEntityService implements ITwitterEntityService {
         long count = queryFactory.select(qTwitterEntity.id)
                 .from(qTwitterEntity)
                 .where(qTwitterEntity.twitterId.eq(twitterId))
+                .fetchCount();
+
+        return count >= 1;
+    }
+
+    private HashtagEntity getOrCreate(String hashtag) {
+
+        if(existsHashtag(hashtag)) {
+
+            return getHashTag(hashtag);
+        }
+
+        HashtagEntity hashtagEntity = new HashtagEntity();
+        hashtagEntity.setHashtag(hashtag);
+
+        return hashtagEntity;
+    }
+
+    private HashtagEntity getHashTag(String hashtag) {
+
+        QHashtagEntity qHashtag = QHashtagEntity.hashtagEntity;
+
+        return queryFactory.selectFrom(qHashtag)
+                .where(qHashtag.hashtag.equalsIgnoreCase(hashtag))
+                .fetchOne();
+    }
+
+    private boolean existsHashtag(String hashtag) {
+
+        QHashtagEntity qHashtag = QHashtagEntity.hashtagEntity;
+
+        long count = queryFactory.select(qHashtag.id)
+                .from(qHashtag)
+                .where(qHashtag.hashtag.equalsIgnoreCase(hashtag))
                 .fetchCount();
 
         return count >= 1;
