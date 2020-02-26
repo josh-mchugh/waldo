@@ -4,7 +4,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
-    <changeSet author="jmchugh" id="1">
+    <changeSet id="1" author="jmchugh">
         <createTable tableName="twitter">
             <column name="id" type="nvarchar(255)">
                 <constraints primaryKey="true" primaryKeyName="PK__twitter"/>
@@ -14,7 +14,7 @@
             <column name="created_date" type="timestamp"/>
             <column name="last_modified_by" type="nvarchar(255)"/>
             <column name="last_modified_date" type="timestamp"/>
-            <column name="twitter_id" type="nvarchar(255)">
+            <column name="twitter_id" type="bigint">
                 <constraints nullable="false" unique="true"/>
             </column>
             <column name="username" type="nvarchar(255)">
@@ -48,8 +48,11 @@
             <column name="tweet_date" type="timestamp">
                 <constraints nullable="false"/>
             </column>
+            <column name="favorited" type="boolean">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
-        <addForeignKeyConstraint baseTableName="tweet" baseColumnNames="id" constraintName="fk__tweet_twitter_id_twitter_id" referencedTableName="twitter" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="tweet" baseColumnNames="twitter_id" constraintName="fk__tweet_twitter_id_twitter_id" referencedTableName="twitter" referencedColumnNames="id"/>
         <createTable tableName="hashtag">
             <column name="id" type="nvarchar(255)">
                 <constraints primaryKey="true" primaryKeyName="PK__hashtag"/>
@@ -66,7 +69,7 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <addForeignKeyConstraint baseTableName="hashtag" baseColumnNames="id" constraintName="fk__hashtag_tweet_id_tweet_id" referencedTableName="tweet" referencedColumnNames="id" />
+        <addForeignKeyConstraint baseTableName="hashtag" baseColumnNames="tweet_id" constraintName="fk__hashtag_tweet_id_tweet_id" referencedTableName="tweet" referencedColumnNames="id" />
     </changeSet>
 
 </databaseChangeLog>

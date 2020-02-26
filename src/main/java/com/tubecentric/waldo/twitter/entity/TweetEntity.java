@@ -30,6 +30,10 @@ public class TweetEntity extends AbstractEntity {
     @Column(name = "tweet_date", nullable = false)
     private LocalDateTime tweetDate;
 
+    @Basic
+    @Column(name = "favorited", nullable = false)
+    private boolean favorited;
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "tweet")
     private List<HashtagEntity> hashtags;
 }

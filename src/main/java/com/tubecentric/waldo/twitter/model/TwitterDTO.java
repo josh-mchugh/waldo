@@ -16,7 +16,5 @@ public class TwitterDTO {
     private final String description;
     private final String url;
     private final Long followers;
-
-    @Singular
-    private final List<TweetDTO> tweets;
+    private final TweetDTO tweet;
 }

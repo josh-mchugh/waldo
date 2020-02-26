@@ -19,4 +19,14 @@ public class HashtagEntity extends AbstractEntity {
     @Basic
     @Column(name = "hashtag", nullable = false)
     private String hashtag;
+
+    public HashtagEntity() {
+
+    }
+
+    public HashtagEntity(TweetEntity tweet, String hashtag) {
+
+        this.tweet = tweet;
+        this.hashtag = hashtag.toLowerCase();
+    }
 }
