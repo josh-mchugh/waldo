@@ -40,7 +40,7 @@ public class TwitterEntity extends AbstractEntity {
 
     @Basic
     @Column(name = "followers")
-    private Long followers;
+    private Integer followers;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "twitter")
     private List<TweetEntity> tweets;

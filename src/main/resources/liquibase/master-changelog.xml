@@ -6,13 +6,11 @@
 
     <changeSet id="1" author="jmchugh">
         <createTable tableName="twitter">
-            <column name="id" type="nvarchar(255)">
+            <column name="id" type="int">
                 <constraints primaryKey="true" primaryKeyName="PK__twitter"/>
             </column>
-            <column name="version" type="bigint"/>
-            <column name="created_by" type="nvarchar(255)"/>
+            <column name="version" type="int"/>
             <column name="created_date" type="timestamp"/>
-            <column name="last_modified_by" type="nvarchar(255)"/>
             <column name="last_modified_date" type="timestamp"/>
             <column name="twitter_id" type="bigint">
                 <constraints nullable="false" unique="true"/>
@@ -25,18 +23,16 @@
             </column>
             <column name="description" type="nvarchar(255)"/>
             <column name="url" type="nvarchar(max)"/>
-            <column name="followers" type="bigint"/>
+            <column name="followers" type="int"/>
         </createTable>
         <createTable tableName="tweet">
-            <column name="id" type="nvarchar(255)">
+            <column name="id" type="int">
                 <constraints primaryKey="true" primaryKeyName="PK__tweet"/>
             </column>
-            <column name="version" type="bigint"/>
-            <column name="created_by" type="nvarchar(255)"/>
+            <column name="version" type="int"/>
             <column name="created_date" type="timestamp"/>
-            <column name="last_modified_by" type="nvarchar(255)"/>
             <column name="last_modified_date" type="timestamp"/>
-            <column name="twitter_id" type="nvarchar(255)">
+            <column name="twitter_id" type="int">
                 <constraints nullable="false"/>
             </column>
             <column name="tweet_id" type="bigint">
@@ -54,22 +50,37 @@
         </createTable>
         <addForeignKeyConstraint baseTableName="tweet" baseColumnNames="twitter_id" constraintName="fk__tweet_twitter_id_twitter_id" referencedTableName="twitter" referencedColumnNames="id"/>
         <createTable tableName="hashtag">
-            <column name="id" type="nvarchar(255)">
+            <column name="id" type="int">
                 <constraints primaryKey="true" primaryKeyName="PK__hashtag"/>
             </column>
-            <column name="version" type="bigint"/>
-            <column name="created_by" type="nvarchar(255)"/>
+            <column name="version" type="int"/>
             <column name="created_date" type="timestamp"/>
-            <column name="last_modified_by" type="nvarchar(255)"/>
             <column name="last_modified_date" type="timestamp"/>
-            <column name="tweet_id" type="nvarchar(255)">
+            <column name="tweet_id" type="int">
                 <constraints nullable="false"/>
             </column>
             <column name="hashtag" type="nvarchar(255)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <addForeignKeyConstraint baseTableName="hashtag" baseColumnNames="tweet_id" constraintName="fk__hashtag_tweet_id_tweet_id" referencedTableName="tweet" referencedColumnNames="id" />
+        <createTable tableName="tweet_hashtag">
+            <column name="id" type="int">
+                <constraints primaryKey="true" primaryKeyName="PK__tweet_hashtag"/>
+            </column>
+            <column name="version" type="int"/>
+            <column name="created_by" type="nvarchar(255)"/>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="nvarchar(255)"/>
+            <column name="last_modified_date" type="timestamp"/>
+            <column name="tweet_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hashtag_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="tweet_hashtag" baseColumnNames="tweet_id" constraintName="fk__tweet_hashtag_tweet_id_tweet_id" referencedTableName="tweet" referencedColumnNames="id" />
+        <addForeignKeyConstraint baseTableName="tweet_hashtag" baseColumnNames="hashtag_id" constraintName="fk__tweet_hashtag_hashtag_id_hashtag_id" referencedTableName="hashtag" referencedColumnNames="id" />
     </changeSet>
 
 </databaseChangeLog>

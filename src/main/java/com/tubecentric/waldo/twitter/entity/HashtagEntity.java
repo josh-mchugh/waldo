@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter
@@ -12,21 +13,10 @@ import javax.persistence.*;
 @Table(name="hashtag")
 public class HashtagEntity extends AbstractEntity {
 
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name = "tweet_id", nullable = false)
-    private TweetEntity tweet;
-
     @Basic
     @Column(name = "hashtag", nullable = false)
     private String hashtag;
 
-    public HashtagEntity() {
-
-    }
-
-    public HashtagEntity(TweetEntity tweet, String hashtag) {
-
-        this.tweet = tweet;
-        this.hashtag = hashtag.toLowerCase();
-    }
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true, mappedBy = "hashtag")
+    private List<TweetHashtagEntity> tweetHashtag;
 }
