@@ -2,13 +2,13 @@ package com.tubecentric.waldo.twitter.listener;
 
 import com.google.common.collect.Lists;
 import com.tubecentric.waldo.framework.TwitterConfig;
-import com.tubecentric.waldo.twitter.integration.TwitterGateway;
 import com.tubecentric.waldo.twitter.model.TweetDTO;
 import com.tubecentric.waldo.twitter.model.TwitterDTO;
+import com.tubecentric.waldo.twitter.service.ITwitterEntityService;
+import com.tubecentric.waldo.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import twitter4j.FilterQuery;
@@ -29,13 +29,13 @@ import java.util.stream.Collectors;
 public class TwitterListener {
 
     private final TwitterConfig twitterConfig;
-    private final ApplicationContext context;
+    private final ITwitterEntityService twitterEntityService;
 
     @EventListener(ApplicationReadyEvent.class)
     public void doSomethingAfterStartup() {
 
-        ConfigurationBuilder cb = new ConfigurationBuilder();
-        cb.setDebugEnabled(true)
+        ConfigurationBuilder cb = new ConfigurationBuilder()
+                .setDebugEnabled(true)
                 .setOAuthConsumerKey(twitterConfig.getKey())
                 .setOAuthConsumerSecret(twitterConfig.getSecret())
                 .setOAuthAccessToken(twitterConfig.getAccessToken())
@@ -54,27 +54,37 @@ public class TwitterListener {
 
             public void onStatus(Status status) {
 
-                TwitterGateway twitterGateway = context.getBean(TwitterGateway.class);
+                log.info("=======================================================");
+                log.info("Username: {}", status.getUser().getName());
+                log.info("Screen name: {}", status.getUser().getScreenName());
+                log.info("Url: {}", status.getUser().getURL());
+                log.info("Description: {}", status.getUser().getDescription());
+                log.info("Message: {}", status.getText());
+                log.info("Retweet: {}", status.isRetweet());
+                log.info("=======================================================");
 
-                TwitterDTO twitterDTO = TwitterDTO.builder()
-                        .twitterId(status.getUser().getId())
-                        .username(status.getUser().getName())
-                        .screenName(status.getUser().getScreenName())
-                        .description(status.getUser().getDescription())
-                        .url(status.getUser().getURL())
-                        .followers((long) status.getUser().getFollowersCount())
-                        .tweet(TweetDTO.builder()
-                                .tweetId(status.getId())
-                                .message(status.getText())
-                                .isRetweet(status.isRetweet())
-                                .hashtags(Lists.newArrayList(status.getHashtagEntities()).stream()
-                                        .map(HashtagEntity::getText).collect(Collectors.toList())
-                                )
-                                .build()
-                        )
-                        .build();
+                if(!status.isRetweet()) {
 
-                twitterGateway.send(twitterDTO);
+                    TwitterDTO twitterDTO = TwitterDTO.builder()
+                            .twitterId(status.getUser().getId())
+                            .username(status.getUser().getName())
+                            .screenName(status.getUser().getScreenName())
+                            .description(status.getUser().getDescription())
+                            .url(status.getUser().getURL())
+                            .followers((long) status.getUser().getFollowersCount())
+                            .tweet(TweetDTO.builder()
+                                    .tweetId(status.getId())
+                                    .tweetDate(DateUtils.toLocalDateTime(status.getCreatedAt()))
+                                    .message(status.getText())
+                                    .hashtags(Lists.newArrayList(status.getHashtagEntities()).stream()
+                                            .map(HashtagEntity::getText).collect(Collectors.toList())
+                                    )
+                                    .build()
+                            )
+                            .build();
+
+                    twitterEntityService.saveTweet(twitterDTO);
+                }
             }
 
             public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {

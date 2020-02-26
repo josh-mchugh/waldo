@@ -20,7 +20,7 @@ public class TwitterEntity extends AbstractEntity {
 
     @Basic
     @Column(name = "twitter_id", unique = true, nullable = false)
-    private String twitterId;
+    private Long twitterId;
 
     @Basic
     @Column(name = "username", nullable = false)

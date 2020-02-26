@@ -14,7 +14,6 @@ public class TweetDTO {
     private final Long tweetId;
     private final String message;
     private final LocalDateTime tweetDate;
-    private final boolean isRetweet;
 
     @Singular
     private final List<String> hashtags;
