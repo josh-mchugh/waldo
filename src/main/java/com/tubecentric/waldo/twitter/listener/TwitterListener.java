@@ -72,6 +72,7 @@ public class TwitterListener {
                             .description(status.getUser().getDescription())
                             .url(status.getUser().getURL())
                             .followers(status.getUser().getFollowersCount())
+                            .favorited(status.isFavorited())
                             .tweet(TweetDTO.builder()
                                     .tweetId(status.getId())
                                     .tweetDate(DateUtils.toLocalDateTime(status.getCreatedAt()))

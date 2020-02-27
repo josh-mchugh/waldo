@@ -2,6 +2,7 @@ package com.tubecentric.waldo.twitter.entity;
 
 import com.tubecentric.waldo.framework.entity.AbstractEntity;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.CascadeType;
@@ -13,6 +14,7 @@ import javax.persistence.Table;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 @Table(name = "tweet_hashtag")
 public class TweetHashtagEntity extends AbstractEntity {
 

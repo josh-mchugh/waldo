@@ -42,7 +42,7 @@ public class TwitterEntityService implements ITwitterEntityService {
         tweetEntity.setTweetId(twitterDTO.getTweet().getTweetId());
         tweetEntity.setTweetDate(twitterDTO.getTweet().getTweetDate());
         tweetEntity.setMessage(twitterDTO.getTweet().getMessage());
-        tweetEntity.setFavorited(false);
+        tweetEntity.setFavorited(twitterDTO.isFavorited());
 
         // Build hashtag list for tweet
         List<TweetHashtagEntity> tweetHashtagEntities = twitterDTO.getTweet().getHashtags().stream()
