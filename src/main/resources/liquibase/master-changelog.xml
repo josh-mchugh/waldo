@@ -6,7 +6,7 @@
 
     <changeSet id="1" author="jmchugh">
         <createTable tableName="twitter">
-            <column name="id" type="int">
+            <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" primaryKeyName="PK__twitter"/>
             </column>
             <column name="version" type="int"/>
@@ -26,7 +26,7 @@
             <column name="followers" type="int"/>
         </createTable>
         <createTable tableName="tweet">
-            <column name="id" type="int">
+            <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" primaryKeyName="PK__tweet"/>
             </column>
             <column name="version" type="int"/>
@@ -50,27 +50,22 @@
         </createTable>
         <addForeignKeyConstraint baseTableName="tweet" baseColumnNames="twitter_id" constraintName="fk__tweet_twitter_id_twitter_id" referencedTableName="twitter" referencedColumnNames="id"/>
         <createTable tableName="hashtag">
-            <column name="id" type="int">
+            <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" primaryKeyName="PK__hashtag"/>
             </column>
             <column name="version" type="int"/>
             <column name="created_date" type="timestamp"/>
             <column name="last_modified_date" type="timestamp"/>
-            <column name="tweet_id" type="int">
-                <constraints nullable="false"/>
-            </column>
             <column name="hashtag" type="nvarchar(255)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
         <createTable tableName="tweet_hashtag">
-            <column name="id" type="int">
+            <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" primaryKeyName="PK__tweet_hashtag"/>
             </column>
             <column name="version" type="int"/>
-            <column name="created_by" type="nvarchar(255)"/>
             <column name="created_date" type="timestamp"/>
-            <column name="last_modified_by" type="nvarchar(255)"/>
             <column name="last_modified_date" type="timestamp"/>
             <column name="tweet_id" type="int">
                 <constraints nullable="false"/>
