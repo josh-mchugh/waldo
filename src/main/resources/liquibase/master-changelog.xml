@@ -22,7 +22,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="description" type="nvarchar(255)"/>
-            <column name="url" type="nvarchar(max)"/>
+            <column name="url" type="nvarchar(2500)"/>
             <column name="followers" type="int"/>
         </createTable>
         <createTable tableName="tweet">
