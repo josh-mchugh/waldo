@@ -14,7 +14,7 @@ import java.util.List;
 public class HashtagEntity extends AbstractEntity {
 
     @Basic
-    @Column(name = "hashtag", nullable = false)
+    @Column(name = "hashtag", nullable = false, unique = true)
     private String hashtag;
 
     @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true, mappedBy = "hashtag")
