@@ -2,9 +2,9 @@ package com.tubecentric.waldo.twitter.scheduler;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.JPQLQueryFactory;
-import com.tubecentric.waldo.framework.TwitterConfig;
 import com.tubecentric.waldo.twitter.entity.QTweetEntity;
 import com.tubecentric.waldo.twitter.entity.TweetEntity;
+import com.tubecentric.waldo.twitter.service.ITwitterEntityService;
 import com.tubecentric.waldo.twitter.service.ITwitterService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,8 +14,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.conf.ConfigurationBuilder;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
@@ -23,7 +21,6 @@ import java.util.List;
 
 @Slf4j
 @Component
-@Transactional
 @RequiredArgsConstructor
 public class TwitterFavoritedScheduler {
 
@@ -36,45 +33,58 @@ public class TwitterFavoritedScheduler {
 
         log.info("Retrieve tweets to be favorites.");
 
-        Twitter twitter = twitterService.getTwitter();
-
-        for(TweetEntity tweet : getTweets()) {
+        for(TweetEntity tweetEntity : getTweets()) {
 
             try {
 
-                log.info("Favoring tweet: {}", tweet.getTweetId());
-                twitter.createFavorite(tweet.getTweetId());
-
-                tweet.setFavorited(true);
-                entityManager.persist(tweet);
+                handleFavoriteTweet(tweetEntity);
 
                 Thread.sleep(1000 * 10);
 
             } catch (TwitterException e) {
 
-                if(e.getErrorCode() == 139) {
-
-                    log.warn("Tweet is already favorite: {}", tweet.getTweetId());
-
-                    tweet.setFavorited(true);
-                    entityManager.persist(tweet);
-
-                }else if(e.getErrorCode() == 144) {
-
-                    log.warn("Tweet no longer exists: {}", tweet.getTweetId());
-
-                    entityManager.remove(tweet);
-
-                } else {
-
-                    log.error(String.format("Unable to favorite tweet: %s", e.getErrorCode()), e);
+                switch (e.getErrorCode()) {
+                    case 139:
+                        handleAlreadyFavorite(tweetEntity);
+                        break;
+                    case 144:
+                        handleTweetRemoved(tweetEntity);
+                        break;
+                    default:
+                        log.error("Unable to favorite tweet.", e);
                 }
 
             } catch (Exception e) {
 
-                log.error("Unable to favorite tweet", e);
+                log.error("Error occurred favoriting tweet", e);
             }
         }
+    }
+
+    private void handleFavoriteTweet(TweetEntity tweetEntity) throws TwitterException {
+
+        log.info("Favoring tweet: {}", tweetEntity.getTweetId());
+
+        Twitter twitter = twitterService.getTwitter();
+        twitter.createFavorite(tweetEntity.getTweetId());
+
+        tweetEntity.setFavorited(true);
+        entityManager.persist(tweetEntity);
+    }
+
+    private void handleAlreadyFavorite(TweetEntity tweetEntity) {
+
+        log.warn("Tweet is already favorite: {}", tweetEntity.getTweetId());
+
+        tweetEntity.setFavorited(true);
+        entityManager.persist(tweetEntity);
+    }
+
+    private void handleTweetRemoved(TweetEntity tweetEntity) {
+
+        log.warn("Tweet no longer exists: {}", tweetEntity.getTweetId());
+
+        entityManager.remove(tweetEntity);
     }
 
     private List<TweetEntity> getTweets() {
