@@ -78,7 +78,7 @@ public class TwitterListener {
                                     .tweetDate(DateUtils.toLocalDateTime(status.getCreatedAt()))
                                     .message(status.getText())
                                     .hashtags(Lists.newArrayList(status.getHashtagEntities()).stream()
-                                            .map(HashtagEntity::getText)
+                                            .map(hashtag -> hashtag.getText().toLowerCase())
                                             .collect(Collectors.toSet())
                                     )
                                     .build()
