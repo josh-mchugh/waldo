@@ -78,4 +78,8 @@
         <addForeignKeyConstraint baseTableName="tweet_hashtag" baseColumnNames="hashtag_id" constraintName="fk__tweet_hashtag_hashtag_id_hashtag_id" referencedTableName="hashtag" referencedColumnNames="id" />
     </changeSet>
 
+    <changeSet id="id" author="jmchugh">
+        <addUniqueConstraint tableName="hashtag" columnNames="hashtag" />
+    </changeSet>
+
 </databaseChangeLog>
