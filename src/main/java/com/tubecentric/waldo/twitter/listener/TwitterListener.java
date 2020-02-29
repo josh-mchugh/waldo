@@ -44,7 +44,9 @@ public class TwitterListener {
         twitterStream.addListener(getTwitterListener());
 
         twitterStream.sample();
-        twitterStream.filter(new FilterQuery().track("#smallyoutuber", "#SmallYouTuberArmy", "#youtubers", "#smallyoutubecommunity").language("en"));
+        twitterStream.filter(new FilterQuery()
+                .track("#smallyoutuber", "#SmallYouTuberArmy", "#youtubers", "#smallyoutubecommunity", "#youtubegaming", "#newyoutubers", "#SupportSmallYoutubers")
+                .language("en"));
     }
 
     private StatusListener getTwitterListener() {
