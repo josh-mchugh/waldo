@@ -117,7 +117,7 @@ public class TwitterEntityService implements ITwitterEntityService {
         QHashtagEntity qHashtag = QHashtagEntity.hashtagEntity;
 
         return queryFactory.selectFrom(qHashtag)
-                .where(qHashtag.hashtag.equalsIgnoreCase(hashtag))
+                .where(qHashtag.hashtag.eq(hashtag))
                 .fetchOne();
     }
 
@@ -127,7 +127,7 @@ public class TwitterEntityService implements ITwitterEntityService {
 
         long count = queryFactory.select(qHashtag.id)
                 .from(qHashtag)
-                .where(qHashtag.hashtag.equalsIgnoreCase(hashtag))
+                .where(qHashtag.hashtag.eq(hashtag))
                 .fetchCount();
 
         return count >= 1;
